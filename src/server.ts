@@ -33,10 +33,11 @@ server.get('/', async (request, reply) => {
   try {
     await DatabaseService.ping();
     await CacheService.ping();
-    return { status: 'ok' };
+    await QueueService.ping();
+    return reply.code(200).send({ status: 'ok' });
   } catch (error) {
-    server.log.error(error);
-    return reply.status(500).send({ error: 'Health check failed' });
+    server.log.error('Health check failed:', error);
+    return reply.code(500).send({ status: 'error', message: 'Health check failed' });
   }
 });
 
@@ -55,7 +56,7 @@ const start = async () => {
     await DatabaseService.connect();
     await CacheService.connect();
     await QueueService.init();
-    const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+    const port = process.env.PORT ? parseInt(process.env.PORT) : 8080;
     await server.listen({ port, host: '0.0.0.0' });
     console.log(`Server is running on port ${port}`);
   } catch (err) {

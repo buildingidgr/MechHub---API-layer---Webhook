@@ -52,5 +52,12 @@ export class QueueService {
       removeOnComplete: true
     });
   }
+
+  static async ping() {
+    if (!this.queue) {
+      throw new Error('Queue not initialized');
+    }
+    await this.queue.client.ping();
+  }
 }
 
