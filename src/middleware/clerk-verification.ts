@@ -6,7 +6,8 @@ export async function verifyClerkWebhook(request: FastifyRequest, reply: Fastify
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    throw new Error('CLERK_WEBHOOK_SECRET is not set');
+    console.warn('CLERK_WEBHOOK_SECRET is not set. Webhook verification is disabled.');
+    return;
   }
 
   const payload = JSON.stringify(request.body);

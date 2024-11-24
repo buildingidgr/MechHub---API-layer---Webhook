@@ -41,7 +41,7 @@ server.get('/', async (request, reply) => {
 });
 
 // Check environment variables
-const requiredEnvVars = ['MONGODB_URI', 'REDIS_URL', 'CLERK_WEBHOOK_SECRET'];
+const requiredEnvVars = ['MONGODB_URI', 'REDIS_URL'];
 const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
 
 if (missingEnvVars.length > 0) {
