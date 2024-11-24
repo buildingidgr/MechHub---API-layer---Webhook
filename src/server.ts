@@ -1,5 +1,4 @@
 import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
-import { Server, IncomingMessage, ServerResponse } from 'http';
 import { webhookHandler } from './handlers/webhook';
 import { verifyClerkWebhook } from './middleware/clerk-verification';
 import { QueueService } from './services/queue';
