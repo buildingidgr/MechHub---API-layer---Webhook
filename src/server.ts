@@ -1,24 +1,27 @@
-import Fastify, { FastifyInstance } from 'fastify';
+import Fastify, { FastifyInstance, FastifyServerOptions } from 'fastify';
+import { Server, IncomingMessage, ServerResponse } from 'http';
 import { webhookHandler } from './handlers/webhook';
 import { verifyClerkWebhook } from './middleware/clerk-verification';
 import { QueueService } from './services/queue';
 import { DatabaseService } from './services/database';
 import { CacheService } from './services/cache';
 
-const server: FastifyInstance = Fastify({
+const serverOptions: FastifyServerOptions = {
   logger: {
     level: process.env.LOG_LEVEL || 'info',
     serializers: {
-      err: (err) => {
+      err: (err: any) => {
         return {
-          type: err.type,
+          type: err.type || 'UNKNOWN',
           message: err.message,
-          stack: err.stack
+          stack: err.stack || 'No stack trace available'
         };
       }
     }
   }
-});
+};
+
+const server: FastifyInstance = Fastify(serverOptions);
 
 // Register middleware
 server.addHook('preHandler', verifyClerkWebhook);

@@ -19,6 +19,7 @@
   "devDependencies": {
     "@types/bull": "^4.10.0",
     "@types/node": "^20.2.5",
+    "@types/fastify": "^4.0.0",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.0.4"
   },
