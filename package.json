@@ -1,0 +1,28 @@
+{
+  "name": "mechhub-webhook-handler",
+  "version": "1.0.0",
+  "description": "Webhook handler for MechHub",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts"
+  },
+  "dependencies": {
+    "@clerk/clerk-sdk-node": "^4.10.2",
+    "bull": "^4.10.4",
+    "fastify": "^4.17.0",
+    "ioredis": "^5.3.2",
+    "mongodb": "^5.5.0"
+  },
+  "devDependencies": {
+    "@types/bull": "^4.10.0",
+    "@types/node": "^20.2.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+
