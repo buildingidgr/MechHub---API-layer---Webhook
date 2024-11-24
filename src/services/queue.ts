@@ -10,15 +10,16 @@ interface WebhookPayload {
 }
 
 export class QueueService {
-  private static queue = new Bull('user-processing', process.env.REDIS_URL || '');
+  private static queue: Bull.Queue<WebhookPayload>;
 
   static async init() {
+    this.queue = new Bull<WebhookPayload>('user-processing', process.env.REDIS_URL || '');
+
     this.queue.process('process-new-user', async (job) => {
-      const { userId, email, timestamp }: WebhookPayload = job.data;
+      const { userId, email, timestamp } = job.data;
       
       const apiKey = await KeyGenerator.generate(userId);
       
-      // Store in database
       await DatabaseService.storeApiKey({
         userId,
         email,
@@ -26,7 +27,6 @@ export class QueueService {
         createdAt: timestamp
       });
       
-      // Cache the API key for quick retrieval
       await CacheService.setApiKey(userId, apiKey);
       
       return { success: true, userId, apiKey };
