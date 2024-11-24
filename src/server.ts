@@ -22,8 +22,14 @@ const serverOptions: FastifyServerOptions = {
 
 const server: FastifyInstance = Fastify(serverOptions);
 
-// Register middleware
-server.addHook('preHandler', verifyClerkWebhook);
+// Register Clerk webhook verification middleware only for the /webhook/clerk route
+server.addHook('preHandler', (request, reply, done) => {
+  if (request.routerPath === '/webhook/clerk') {
+    verifyClerkWebhook(request, reply, done);
+  } else {
+    done();
+  }
+});
 
 // Register routes
 server.post('/webhook/clerk', webhookHandler);

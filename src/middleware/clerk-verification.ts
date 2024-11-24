@@ -2,11 +2,12 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import { Webhook } from 'svix';
 import { WebhookEvent } from '@clerk/clerk-sdk-node';
 
-export async function verifyClerkWebhook(request: FastifyRequest, reply: FastifyReply) {
+export function verifyClerkWebhook(request: FastifyRequest, reply: FastifyReply, done: (err?: Error) => void) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
     console.warn('CLERK_WEBHOOK_SECRET is not set. Webhook verification is disabled.');
+    done();
     return;
   }
 
@@ -18,8 +19,9 @@ export async function verifyClerkWebhook(request: FastifyRequest, reply: Fastify
   try {
     const evt = wh.verify(payload, headers as Record<string, string>) as WebhookEvent;
     request.body = evt;
+    done();
   } catch (err) {
-    return reply.code(400).send('Invalid webhook');
+    done(new Error('Invalid webhook'));
   }
 }
 
