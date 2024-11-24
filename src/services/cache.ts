@@ -4,7 +4,20 @@ export class CacheService {
   private static redis: Redis;
 
   static async connect() {
-    this.redis = new Redis(process.env.REDIS_URL as string);
+    try {
+      this.redis = new Redis(process.env.REDIS_URL as string);
+      console.log('Connected to Redis');
+    } catch (error) {
+      console.error('Failed to connect to Redis:', error);
+      throw error;
+    }
+  }
+
+  static async ping() {
+    if (!this.redis) {
+      throw new Error('Redis not connected');
+    }
+    await this.redis.ping();
   }
 
   static async setApiKey(userId: string, apiKey: string, ttl: number = 86400) {

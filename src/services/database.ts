@@ -5,15 +5,28 @@ export class DatabaseService {
   private static db: any;
 
   static async connect() {
-    this.client = await MongoClient.connect(process.env.MONGODB_URI as string);
-    this.db = this.client.db('mechhub');
+    try {
+      this.client = await MongoClient.connect(process.env.MONGODB_URI as string);
+      this.db = this.client.db('mechhub');
+      console.log('Connected to MongoDB');
+    } catch (error) {
+      console.error('Failed to connect to MongoDB:', error);
+      throw error;
+    }
+  }
+
+  static async ping() {
+    if (!this.db) {
+      throw new Error('Database not connected');
+    }
+    await this.db.command({ ping: 1 });
   }
 
   static async storeApiKey({ userId, email, apiKey, createdAt }: {
     userId: string;
     email: string;
     apiKey: string;
-    createdAt: Date;  // Changed from string to Date
+    createdAt: Date;
   }) {
     if (!this.db) await this.connect();
     
@@ -21,7 +34,7 @@ export class DatabaseService {
       userId,
       email,
       apiKey,
-      createdAt  // This is now a Date object
+      createdAt
     });
   }
 }

@@ -2,10 +2,21 @@ import Fastify, { FastifyInstance } from 'fastify';
 import { webhookHandler } from './handlers/webhook';
 import { verifyClerkWebhook } from './middleware/clerk-verification';
 import { QueueService } from './services/queue';
+import { DatabaseService } from './services/database';
+import { CacheService } from './services/cache';
 
 const server: FastifyInstance = Fastify({
   logger: {
-    level: process.env.LOG_LEVEL || 'info'
+    level: process.env.LOG_LEVEL || 'info',
+    serializers: {
+      err: (err) => {
+        return {
+          type: err.type,
+          message: err.message,
+          stack: err.stack
+        };
+      }
+    }
   }
 });
 
@@ -17,12 +28,21 @@ server.post('/webhook/clerk', webhookHandler);
 
 // Add a health check route
 server.get('/', async (request, reply) => {
-  return { status: 'ok' };
+  try {
+    await DatabaseService.ping();
+    await CacheService.ping();
+    return { status: 'ok' };
+  } catch (error) {
+    server.log.error(error);
+    return reply.status(500).send({ error: 'Health check failed' });
+  }
 });
 
 // Start the server
 const start = async () => {
   try {
+    await DatabaseService.connect();
+    await CacheService.connect();
     await QueueService.init();
     const port = process.env.PORT ? parseInt(process.env.PORT) : 3000;
     await server.listen({ port, host: '0.0.0.0' });
