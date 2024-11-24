@@ -10,7 +10,7 @@ interface WebhookPayload {
 }
 
 export class QueueService {
-  private static queue = new Bull('user-processing', process.env.REDIS_URL);
+  private static queue = new Bull('user-processing', process.env.REDIS_URL || '');
 
   static async init() {
     this.queue.process('process-new-user', async (job) => {
