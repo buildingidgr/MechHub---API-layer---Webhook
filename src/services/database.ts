@@ -5,8 +5,13 @@ export class DatabaseService {
   private static db: any;
 
   static async connect() {
+    const mongoUri = process.env.MONGODB_URI;
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI environment variable is not set');
+    }
+
     try {
-      this.client = await MongoClient.connect(process.env.MONGODB_URI as string);
+      this.client = await MongoClient.connect(mongoUri);
       this.db = this.client.db('mechhub');
       console.log('Connected to MongoDB');
     } catch (error) {
