@@ -17,7 +17,7 @@ export async function webhookHandler(
     await QueueService.add('process-new-user', {
       userId: event.data.id,
       email: event.data.email_addresses[0]?.email_address || '',
-      timestamp: event.data.created_at
+      timestamp: event.data.created_at  // This is now a number
     });
 
     reply.status(202).send({ status: 'processing' });

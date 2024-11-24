@@ -13,7 +13,7 @@ export class DatabaseService {
     userId: string;
     email: string;
     apiKey: string;
-    createdAt: string;
+    createdAt: Date;  // Changed from string to Date
   }) {
     if (!this.db) await this.connect();
     
@@ -21,7 +21,7 @@ export class DatabaseService {
       userId,
       email,
       apiKey,
-      createdAt: new Date(createdAt)
+      createdAt  // This is now a Date object
     });
   }
 }

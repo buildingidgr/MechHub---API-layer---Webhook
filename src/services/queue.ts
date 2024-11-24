@@ -3,17 +3,17 @@ import { KeyGenerator } from '../utils/key-generator';
 import { DatabaseService } from './database';
 import { CacheService } from './cache';
 
-interface WebhookPayload {
+interface NewUserJobData {
   userId: string;
   email: string;
-  timestamp: string;
+  timestamp: number;  // Changed from string to number
 }
 
 export class QueueService {
-  private static queue: Bull.Queue<WebhookPayload>;
+  private static queue: Bull.Queue<NewUserJobData>;
 
   static async init() {
-    this.queue = new Bull<WebhookPayload>('user-processing', process.env.REDIS_URL || '');
+    this.queue = new Bull<NewUserJobData>('user-processing', process.env.REDIS_URL || '');
 
     this.queue.process('process-new-user', async (job) => {
       const { userId, email, timestamp } = job.data;
@@ -24,7 +24,7 @@ export class QueueService {
         userId,
         email,
         apiKey,
-        createdAt: timestamp
+        createdAt: new Date(timestamp)  // Convert number to Date object
       });
       
       await CacheService.setApiKey(userId, apiKey);
@@ -33,7 +33,7 @@ export class QueueService {
     });
   }
 
-  static async add(type: string, data: WebhookPayload) {
+  static async add(type: string, data: NewUserJobData) {
     return this.queue.add(type, data, {
       attempts: 3,
       backoff: {
