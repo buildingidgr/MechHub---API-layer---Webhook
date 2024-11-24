@@ -10,7 +10,8 @@ export async function webhookHandler(
     const event = request.body;
     
     if (event.type !== 'user.created') {
-      return reply.code(200).send();
+      reply.code(200).send();
+      return;
     }
 
     await QueueService.add('process-new-user', {
@@ -19,10 +20,10 @@ export async function webhookHandler(
       timestamp: event.data.created_at
     });
 
-    return reply.code(202).send({ status: 'processing' });
+    reply.code(202).send({ status: 'processing' });
   } catch (error) {
     request.log.error(error);
-    return reply.code(500).send({ error: 'Internal Server Error' });
+    reply.code(500).send({ error: 'Internal Server Error' });
   }
 }
 
